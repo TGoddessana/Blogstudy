@@ -10,3 +10,6 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
 
     def __str__(self):
         return f'[{self.pk}] {self.title}' # 파이썬 3.6부터 생긴 포매팅 방법.
+
+    def get_absolute_url(self):
+        return f'/blog/{self.pk}'
