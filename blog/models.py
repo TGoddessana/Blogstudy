@@ -4,6 +4,7 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
     title = models.CharField(max_length=30)
     content = models.TextField()
 
+    head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d' , blank=True)
     # 아래의 코드는 자동으로 생성일시, 수정일시를 표현할 수 있도록 해 줍니다.
     created_at = models.DateTimeField(auto_now_add=True) # 생성일자를 표현할 때: auto_now_add
     updated_at = models.DateTimeField(auto_now=True) # 수정일자를 표현할 때 : auto_now
