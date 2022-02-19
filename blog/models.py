@@ -3,6 +3,7 @@ import os
 
 class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든 것.
     title = models.CharField(max_length=30)
+    hook_text = models.CharField(max_length=100, blank=True)
     content = models.TextField()
 
     head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d' , blank=True)
