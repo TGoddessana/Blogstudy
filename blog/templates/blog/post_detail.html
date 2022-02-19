@@ -13,6 +13,8 @@
         <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
         <!-- margin 주는 CSS !-->
         <link rel="stylesheet" href="{% static 'blog/css/blog-post.css' %}" media="screen">
+        <!-- font awsome !-->
+        <script src="https://kit.fontawesome.com/f6d5c3dbc6.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <!-- Responsive navbar-->
@@ -61,7 +63,24 @@
                         {% endif %}
                         <!-- Post content-->
                         <section class="mb-5">
-                        {{ post.content }}
+                        <p>{{ post.content }}</p>
+
+                        {% if post.file_upload %}
+                            <a href="{{ post.file_upload.url }}"  class="btn btn-danger" role="button">
+                            Download:
+                                {% if post.get_file_ext == 'csv' %}
+                                    <i class="fas fa-file-csv"></i>
+                                {% elif post.get_file_ext == 'xlsx' or post.get_file_ext == 'xls' %}
+                                    <i class="fas fa-file-excel"></i>
+                                {% elif post.get_file_ext == 'docs' or post.get_file_ext == 'doc' %}
+                                    <i class="fas fa-file-word"></i>
+                                {% else %}
+                                    <i class="far fa-file"></i>
+                                {% endif %}
+                                {{ post.get_file_name }}
+                            </a>
+                        {% endif %}
+
                         </section>
                     </article>
                     <!-- Comments section-->

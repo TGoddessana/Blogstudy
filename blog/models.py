@@ -1,4 +1,5 @@
 from django.db import models
+import os
 
 class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든 것.
     title = models.CharField(max_length=30)
@@ -15,3 +16,9 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
 
     def get_absolute_url(self):
         return f'/blog/{self.pk}'
+
+    def get_file_name(self):
+        return os.path.basename(self.file_upload.name)
+
+    def get_file_ext(self):
+        return self.get.file_name().split('.')[-1]
