@@ -16,7 +16,7 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
         return f'[{self.pk}] {self.title}' # 파이썬 3.6부터 생긴 포매팅 방법.
 
     def get_absolute_url(self):
-        return f'/blog/{self.pk}'
+        return f'/blog/{self.pk}/'
 
     def get_file_name(self):
         return os.path.basename(self.file_upload.name)
