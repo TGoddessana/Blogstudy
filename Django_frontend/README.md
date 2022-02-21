@@ -1,1 +1,0 @@
-# do_it_django_atoz_frontend
