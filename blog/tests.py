@@ -40,11 +40,13 @@ class TestView(TestCase):
 
         post_001 = Post.objects.create(
             title = '첫 번째 포스트입니다.',
-            content = 'Hello World!'
+            content = 'Hello World!',
+            author = self.user_user1
         )
         post_002 = Post.objects.create(
             title = '두 번째 포스트입니다.',
-            content = 'Nice to meet you.'
+            content = 'Nice to meet you.',
+            author=self.user_user2
         )
 
         self.assertEqual(Post.objects.count(), 2)
@@ -60,11 +62,15 @@ class TestView(TestCase):
         self.assertIn(post_002.title, main_area.text)
         self.assertNotIn('아직 게시물이 없습니다.', main_area.text)
 
+        self.assertIn(self.user_user1.username.upper(), main_area.text)
+        self.assertIn(self.user_user2.username.upper(), main_area.text)
+
 
     def test_post_detail(self):
         post_001 = Post.objects.create(
             title = "첫 번째 포스트입니다.",
-            content = "Hello, World!"
+            content = "Hello, World!",
+            author = self.user_user1,
         )
 
         self.assertEqual(post_001.get_absolute_url(), '/blog/1/')
@@ -78,5 +84,6 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         post_area = main_area.find('div', id='post-area')
 
+        self.assertIn(self.user_user1.username.upper(), post_area.text)
         self.assertIn(post_001.title, post_area.text)
         self.assertIn(post_001.content, post_area.text)
