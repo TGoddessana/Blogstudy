@@ -13,7 +13,7 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
     created_at = models.DateTimeField(auto_now_add=True) # 생성일자를 표현할 때: auto_now_add
     updated_at = models.DateTimeField(auto_now=True) # 수정일자를 표현할 때 : auto_now
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'[{self.pk}] {self.title} :: {self.author}' # 파이썬 3.6부터 생긴 포매팅 방법.

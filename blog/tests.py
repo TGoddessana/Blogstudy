@@ -1,10 +1,13 @@
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
+from django.contrib.auth.models import User
 from .models import Post
 
 class TestView(TestCase):
     def setUp(self):
         self.client = Client()
+        self.user_user1 = User.objects.create_user(username='user1', password='somepassword')
+        self.user_user2 = User.objects.create_user(username='user2', password='somepassword')
 
     def navbar_test(self, soup):
         navbar = soup.nav
