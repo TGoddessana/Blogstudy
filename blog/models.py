@@ -2,6 +2,17 @@ from django.db import models
 import os
 from django.contrib.auth.models import User
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return f'/blog/category/{self.slug}/'
+
+
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     # 카테고리의 이름을 담는 필드, unique=True로 하여 같은 이름의 카테고리를 만들지 못하도록 함
@@ -31,6 +42,8 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return f'[{self.pk}] {self.title} :: {self.author}' # 파이썬 3.6부터 생긴 포매팅 방법.

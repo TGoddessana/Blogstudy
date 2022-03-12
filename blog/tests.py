@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
-from .models import Post, Category
+from .models import Post, Category, Tag
 
 class TestView(TestCase):
     def setUp(self):
@@ -14,6 +14,11 @@ class TestView(TestCase):
         self.category_python = Category.objects.create(name='python', slug='python')
         self.category_javascript = Category.objects.create(name='javascript', slug='javascript')
 
+        # 임의의 태그 만들기
+        self.tag_rust_kor = Tag.objects.create(name='러스트 공부', slug='러스트 공부')
+        self.tag_go = Tag.objects.create(name='go', slug='go')
+        self.tag_js = Tag.objects.create(name='js', slug='js')
+
         # 임의의 포스트 3개 만들기
         self.post_001 = Post.objects.create(
             title = '첫 번째 포스트입니다.',
@@ -21,12 +26,16 @@ class TestView(TestCase):
             category=self.category_python,
             author = self.user_user1
         )
+        # 태그 붙여주기
+        self.post_001.tags.add(self.tag_rust_kor)
+
         self.post_002 = Post.objects.create(
             title = '두 번째 포스트입니다.',
             content = 'Nice to meet you.',
             category=self.category_javascript,
             author=self.user_user2
         )
+        # 태그가 없을 수도 있음
 
         # 아래의 포스트는 카테고리를 지정해두지 않음
         self.post_003 = Post.objects.create(
@@ -34,6 +43,10 @@ class TestView(TestCase):
             content='category가 없을 수도 있죠',
             author=self.user_user2
         )
+        #태그가 여러 개일 수도 있음
+        self.post_003.tags.add(self.tag_go)
+        self.post_003.tags.add(self.tag_js)
+
 
     # 네비게이션 바 테스트 코드
     def navbar_test(self, soup):
@@ -87,19 +100,33 @@ class TestView(TestCase):
         self.assertNotIn('아직 게시물이 없습니다', main_area.text)
 
         # 카테고리가 있는 포스트의 경우, 제목과 카테고리명이 카테고리 카드 안에 포함되어 있는지 확인
+        #태그 테스트하는 코드 추가
         post_001_card = main_area.find('div', id='post-1')
         self.assertIn(self.post_001.title, post_001_card.text)
         self.assertIn(self.post_001.category.name, post_001_card.text)
+        self.assertIn(self.tag_rust_kor.name, post_001_card.text)
+        self.assertNotIn(self.tag_js.name, post_001_card.text)
+        self.assertNotIn(self.tag_go.name, post_001_card.text)
+
 
         # 카테고리가 있는 포스트의 경우, 제목과 카테고리명이 카테고리 카드 안에 포함되어 있는지 확인
+        # 태그 테스트하는 코드 추가
         post_002_card = main_area.find('div', id='post-2')
         self.assertIn(self.post_002.title, post_002_card.text)
         self.assertIn(self.post_002.category.name, post_002_card.text)
+        self.assertNotIn(self.tag_rust_kor.name, post_002_card.text)
+        self.assertNotIn(self.tag_js.name, post_002_card.text)
+        self.assertNotIn(self.tag_go.name, post_002_card.text)
 
         # 포스트 카드 안에 '미분류' 라는 문구가 있는지, 미분류인 포스트의 제목이 포함되어 있는지 확인
+        # 태그 테스트하는 코드 추가
         post_003_card = main_area.find('div', id='post-3')
         self.assertIn('미분류', post_003_card.text)
         self.assertIn(self.post_003.title, post_003_card.text)
+        self.assertIn(self.post_003.author.username.upper(), post_003_card.text)
+        self.assertNotIn(self.tag_rust_kor.name, post_003_card.text)
+        self.assertIn(self.tag_js.name, post_003_card.text)
+        self.assertIn(self.tag_go.name, post_003_card.text)
 
         # 작성자의 이름이 대문자로 포함되어 있는지 확인
         self.assertIn(self.user_user1.username.upper(), main_area.text)
@@ -142,6 +169,10 @@ class TestView(TestCase):
 
         self.assertIn(self.user_user1.username.upper(), post_area.text)
         self.assertIn(self.post_001.content, post_area.text)
+
+        self.assertIn(self.tag_rust_kor.name, post_area.text)
+        self.assertNotIn(self.tag_js.name, post_area.text)
+        self.assertNotIn(self.tag_go.name, post_area.text)
 
     def test_category_page(self):
         response = self.client.get(self.category_python.get_absolute_url())
