@@ -10,6 +10,10 @@ class TestView(TestCase):
         self.user_user1 = User.objects.create_user(username='user1', password='somepassword')
         self.user_user2 = User.objects.create_user(username='user2', password='somepassword')
 
+        # 사용자에 스태프 권한 부여
+        self.user_user1.is_staff = True
+        self.user_user1.save()
+
         # 임의의 카테고리 만들기
         self.category_python = Category.objects.create(name='python', slug='python')
         self.category_javascript = Category.objects.create(name='javascript', slug='javascript')
@@ -213,9 +217,13 @@ class TestView(TestCase):
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
-        #로그인
-        self.client.login(username='user1', password='somepassword')
+        # staff 가 아닌 사용자, user2가 로그인
+        self.client.login(username='user2', password='somepassword')
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
 
+        # staff인 user1가 로그인
+        self.client.login(username='user1', password='somepassword')
         response = self.client.get('/blog/create_post/')
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
