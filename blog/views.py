@@ -5,6 +5,7 @@ from .models import Post, Category, Tag
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 
+# 태그 오류 수정 전.
 
 class PostList(ListView):
     model = Post # model을 정해 줌.
