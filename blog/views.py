@@ -45,6 +45,9 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             if tags_str: # 태그가 채워져 있으면
                 tags_str = tags_str.strip() # 양쪽의 공백 제거
 
+                if tags_str[-1] == ";": # 공백태그 이슈 해결?
+                    tags_str = tags_str[:-1]
+
                 tags_str = tags_str.replace(',', ';') # , 를 ; 로 대체
                 tags_list = tags_str.split(';') # ;를 기준으로 나눔
 
