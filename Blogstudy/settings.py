@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'crispy_forms',
     'blog',
     'single_pages',
 ]
@@ -125,6 +126,7 @@ MEDIA_URL = '/media/'
 # /media로 끝나는 URL로 접속하면 미디어 파일을 사용하겠다는 의미
 MEDIA_ROOT = os.path.join(BASE_DIR, '_media')
 # 미디어 파일은 _media 폴더 안에 저장하겠다는 의미
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
