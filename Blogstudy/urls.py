@@ -22,7 +22,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('blog/', include('blog.urls')), # blog/로 접근하면, blog.urls 파일을 참고해라!
     path('admin/', admin.site.urls),
-    path('markdownx/', include('markdownx.urls'))
+    path('markdownx/', include('markdownx.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
