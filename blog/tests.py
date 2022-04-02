@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 
 class TestView(TestCase):
     def setUp(self):
@@ -50,6 +50,12 @@ class TestView(TestCase):
         #태그가 여러 개일 수도 있음
         self.post_003.tags.add(self.tag_go)
         self.post_003.tags.add(self.tag_js)
+
+        self.comment_001 = Comment.objects.create(
+            post = self.post_001,
+            author = self.user_user1,
+            content = 'first comment.'
+        )
 
 
     # 네비게이션 바 테스트 코드
@@ -177,6 +183,12 @@ class TestView(TestCase):
         self.assertIn(self.tag_rust_kor.name, post_area.text)
         self.assertNotIn(self.tag_js.name, post_area.text)
         self.assertNotIn(self.tag_go.name, post_area.text)
+
+        #comment
+        comments_area = soup.find('div', id='comment-area')
+        comment_001_area = comments_area.find('div', id='comment-1')
+        self.assertIn(self.comment_001.author.username, comment_001_area.text)
+        self.assertIn(self.comment_001.content, comment_001_area.text)
 
     def test_category_page(self):
         response = self.client.get(self.category_python.get_absolute_url())
@@ -313,3 +325,4 @@ class TestView(TestCase):
         self.assertIn('한글 태그', main_area.text)
         self.assertIn('some tag', main_area.text)
         self.assertNotIn('js', main_area.text) # 기존의 태그는 없어야 함
+
