@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
 from .models import Post, Category, Tag, Comment
 
+
 class TestView(TestCase):
     def setUp(self):
         # 임의의 사용자 만들기
@@ -25,17 +26,17 @@ class TestView(TestCase):
 
         # 임의의 포스트 3개 만들기
         self.post_001 = Post.objects.create(
-            title = '첫 번째 포스트입니다.',
-            content = 'Hello World!',
+            title='첫 번째 포스트입니다.',
+            content='Hello World!',
             category=self.category_python,
-            author = self.user_user1
+            author=self.user_user1
         )
         # 태그 붙여주기
         self.post_001.tags.add(self.tag_rust_kor)
 
         self.post_002 = Post.objects.create(
-            title = '두 번째 포스트입니다.',
-            content = 'Nice to meet you.',
+            title='두 번째 포스트입니다.',
+            content='Nice to meet you.',
             category=self.category_javascript,
             author=self.user_user2
         )
@@ -47,21 +48,20 @@ class TestView(TestCase):
             content='category가 없을 수도 있죠',
             author=self.user_user2
         )
-        #태그가 여러 개일 수도 있음
+        # 태그가 여러 개일 수도 있음
         self.post_003.tags.add(self.tag_go)
         self.post_003.tags.add(self.tag_js)
 
         self.comment_001 = Comment.objects.create(
-            post = self.post_001,
-            author = self.user_user1,
-            content = 'first comment.'
+            post=self.post_001,
+            author=self.user_user1,
+            content='first comment.'
         )
-
 
     # 네비게이션 바 테스트 코드
     def navbar_test(self, soup):
         navbar = soup.nav
-        self.assertIn('Blog',navbar.text)
+        self.assertIn('Blog', navbar.text)
         self.assertIn('About Me', navbar.text)
 
         logo_btn = navbar.find('a', text='Do It Django')
@@ -78,18 +78,18 @@ class TestView(TestCase):
 
     # 카테고리 카드 테스트 코드
     def category_card_test(self, soup):
-        categories_card = soup.find('div', id='categories-card') # 카테고리 카드인 곳을 찾아낸다.
-        self.assertIn('Categories', categories_card.text) # 카테고리 카드 부분에 다음의 문구가 있는지 확인
+        categories_card = soup.find('div', id='categories-card')  # 카테고리 카드인 곳을 찾아낸다.
+        self.assertIn('Categories', categories_card.text)  # 카테고리 카드 부분에 다음의 문구가 있는지 확인
 
         # 카테고리 카드 부분에 위에서 만들어 놓은 카테고리와 카테고리 포스트 갯수의 수가 표시되는지 확인
         self.assertIn(f'{self.category_python.name} ({self.category_python.post_set.count()})', categories_card.text)
-        self.assertIn(f'{self.category_javascript.name} ({self.category_javascript.post_set.count()})', categories_card.text)
+        self.assertIn(f'{self.category_javascript.name} ({self.category_javascript.post_set.count()})',
+                      categories_card.text)
         # 미분류인 포스트도 잘 표시되는지 확인
         self.assertIn(f'미분류 (1)', categories_card.text)
 
     # 포스트 리스트 페이지 테스트 코드
     def test_post_list(self):
-
         # 포스트가 있는 경우
 
         # 위에서 만든 포스트 갯수가 3과 같은지 확인
@@ -106,18 +106,17 @@ class TestView(TestCase):
         self.category_card_test(soup)
 
         # 게시물이 있는 경우이므로 아래의 문구가 표시되지 않는지 확인
-        main_area = soup.find('div', id = 'main-area')
+        main_area = soup.find('div', id='main-area')
         self.assertNotIn('아직 게시물이 없습니다', main_area.text)
 
         # 카테고리가 있는 포스트의 경우, 제목과 카테고리명이 카테고리 카드 안에 포함되어 있는지 확인
-        #태그 테스트하는 코드 추가
+        # 태그 테스트하는 코드 추가
         post_001_card = main_area.find('div', id='post-1')
         self.assertIn(self.post_001.title, post_001_card.text)
         self.assertIn(self.post_001.category.name, post_001_card.text)
         self.assertIn(self.tag_rust_kor.name, post_001_card.text)
         self.assertNotIn(self.tag_js.name, post_001_card.text)
         self.assertNotIn(self.tag_go.name, post_001_card.text)
-
 
         # 카테고리가 있는 포스트의 경우, 제목과 카테고리명이 카테고리 카드 안에 포함되어 있는지 확인
         # 태그 테스트하는 코드 추가
@@ -142,7 +141,6 @@ class TestView(TestCase):
         self.assertIn(self.user_user1.username.upper(), main_area.text)
         self.assertIn(self.user_user2.username.upper(), main_area.text)
 
-
         # 포스트가 없는 경우 테스트
 
         # 포스트 모두 삭제
@@ -160,7 +158,6 @@ class TestView(TestCase):
         self.assertIn('아직 게시물이 없습니다', main_area.text)
 
     def test_post_detail(self):
-
         self.assertEqual(self.post_001.get_absolute_url(), '/blog/1/')
 
         response = self.client.get(self.post_001.get_absolute_url())
@@ -184,7 +181,7 @@ class TestView(TestCase):
         self.assertNotIn(self.tag_js.name, post_area.text)
         self.assertNotIn(self.tag_go.name, post_area.text)
 
-        #comment
+        # comment
         comments_area = soup.find('div', id='comment-area')
         comment_001_area = comments_area.find('div', id='comment-1')
         self.assertIn(self.comment_001.author.username, comment_001_area.text)
@@ -223,7 +220,6 @@ class TestView(TestCase):
         self.assertNotIn(self.post_002.title, main_area.text)
         self.assertNotIn(self.post_003.title, main_area.text)
 
-
     def test_create_post(self):
         # 로그인하지 않으면 status code != 200
         response = self.client.get('/blog/create_post/')
@@ -251,9 +247,9 @@ class TestView(TestCase):
         self.client.post(
             '/blog/create_post/',
             {
-                'title' : 'Post Form 만들기',
-                'content' : 'Post Form 페이지를 만듭시다.',
-                'tags_str' : 'new tag; 한글 태그, js'
+                'title': 'Post Form 만들기',
+                'content': 'Post Form 페이지를 만듭시다.',
+                'tags_str': 'new tag; 한글 태그, js'
             }
         )
         self.assertEqual(Post.objects.count(), 4)
@@ -268,7 +264,6 @@ class TestView(TestCase):
         self.assertEqual(Tag.objects.count(), 5)
 
     def test_update_post(self):
-
         # 포스트 003 작성자 = user2
 
         update_post_url = f'/blog/update_post/{self.post_003.pk}/'
@@ -278,7 +273,7 @@ class TestView(TestCase):
         self.assertNotEqual(response.status_code, 200)
 
         # 로그인은 했지만 작성자가 아닌 경우에는 수정 페이지에 접근했을 때에 403 코드(권한 없음) 이 나타나야 함
-        self.assertNotEqual(self.post_003.author, self.user_user1) # 포스트3의 작성자가 user2가 아닌지 확인
+        self.assertNotEqual(self.post_003.author, self.user_user1)  # 포스트3의 작성자가 user2가 아닌지 확인
         self.client.login(
             username=self.user_user1.username,
             password='somepassword'
@@ -307,10 +302,10 @@ class TestView(TestCase):
         response = self.client.post(
             update_post_url,
             {
-                'title' : '세 번째 포스트 수정하기',
-                'content' : '안녕하세요',
-                'category' : self.category_python.pk,
-                'tags_str' : '파이썬 공부; 한글 태그, some tag'
+                'title': '세 번째 포스트 수정하기',
+                'content': '안녕하세요',
+                'category': self.category_python.pk,
+                'tags_str': '파이썬 공부; 한글 태그, some tag'
             },
             follow=True
         )
@@ -324,5 +319,41 @@ class TestView(TestCase):
         self.assertIn('파이썬 공부', main_area.text)
         self.assertIn('한글 태그', main_area.text)
         self.assertIn('some tag', main_area.text)
-        self.assertNotIn('js', main_area.text) # 기존의 태그는 없어야 함
+        self.assertNotIn('js', main_area.text)  # 기존의 태그는 없어야 함
 
+    def test_comment_form(self):
+        self.assertEqual(Comment.objects.count(), 1)  # 전체 댓글 하나
+        self.assertEqual(self.post_001.comment_set.count(), 1)  # 포스트1의 댓글 하나
+
+        # 로그인 X
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertIn('Log in and leave a comment', comment_area.text)  # 로그인 안 한 상태면 위의 문구가 보여야 함
+        self.assertFalse(comment_area.find('form', id='comment-form'))  # 로그인 안 한 상태면 댓글 폼이 보이지 않아야 함
+
+        # 로그인 O
+        self.client.login(username='user1', password='somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertNotIn('Log in and leave a comment', comment_area.text)  # 로그인했다면 위의 문구가 보이지 않아야 함
+
+        comment_form = comment_area.find('form', id='comment-form')
+        self.assertTrue(comment_form.find('textarea', id='id_content'))
+        response = self.client.post(
+            self.post_001.get_absolute_url() + 'new_comment/',
+            {
+                'content': "example comment.",
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(self.post_001.comment_set.count(), 2)
