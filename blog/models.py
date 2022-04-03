@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from markdownx.models import MarkdownxField
 from markdownx.utils import markdown
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
@@ -19,6 +20,7 @@ class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     # 카테고리의 이름을 담는 필드, unique=True로 하여 같은 이름의 카테고리를 만들지 못하도록 함
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
+
     # 슬러그 필드, allow_unicode=True로 한글도 사용할 수 있도록 함
 
     def __str__(self):
@@ -30,16 +32,17 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = 'Categories'
 
-class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든 것.
+
+class Post(models.Model):  # models 모듈의 Model 클래스를 상속해 만든 것.
     title = models.CharField(max_length=30)
     hook_text = models.CharField(max_length=100, blank=True)
     content = MarkdownxField()
 
-    head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d' , blank=True)
-    file_upload = models.FileField(upload_to='blog/files/%Y/%m/%d' , blank=True)
+    head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d', blank=True)
+    file_upload = models.FileField(upload_to='blog/files/%Y/%m/%d', blank=True)
     # 아래의 코드는 자동으로 생성일시, 수정일시를 표현할 수 있도록 해 줍니다.
-    created_at = models.DateTimeField(auto_now_add=True) # 생성일자를 표현할 때: auto_now_add
-    updated_at = models.DateTimeField(auto_now=True) # 수정일자를 표현할 때 : auto_now
+    created_at = models.DateTimeField(auto_now_add=True)  # 생성일자를 표현할 때: auto_now_add
+    updated_at = models.DateTimeField(auto_now=True)  # 수정일자를 표현할 때 : auto_now
 
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
@@ -48,7 +51,7 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
     tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
-        return f'[{self.pk}] {self.title} :: {self.author}' # 파이썬 3.6부터 생긴 포매팅 방법.
+        return f'[{self.pk}] {self.title} :: {self.author}'  # 파이썬 3.6부터 생긴 포매팅 방법.
 
     def get_absolute_url(self):
         return f'/blog/{self.pk}/'
@@ -59,15 +62,16 @@ class Post(models.Model): # models 모듈의 Model 클래스를 상속해 만든
     def get_file_ext(self):
         return self.get.file_name().split('.')[-1]
 
-    def get_content_markdown(self): # 마크다운 문법을 HTML로 변환
+    def get_content_markdown(self):  # 마크다운 문법을 HTML로 변환
         return markdown(self.content)
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.author}::{self.content}'

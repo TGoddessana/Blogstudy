@@ -118,13 +118,32 @@
                                 </div>
 
                                 <div class="ms-3">
-                                    <h5 class="mt-0">
-                                        {{ comment.author.username }}&nbsp;&nbsp;
-                                        <small class="text-muted">
-                                            {{ comment.created_at }}
-                                        </small>
-                                    </h5>
-                                    <p>{{ comment.content | linebreaks }}</p>
+                                    <a class="mt-0">
+                                        {% if user.is_authenticated and comment.author == user %}
+                                            <a role="button"
+                                               class="btn btn-sm btn-info float-right"
+                                               id="comment-{{ comment.pk }}-update-btn"
+                                               href="/blog/update_comment/{{ comment.pk }}/">
+                                                edit
+                                            </a>
+                                        {% endif %}
+                                        <h5 class="mt-0">
+                                            {{ comment.author.username }}&nbsp;&nbsp;
+                                            <small class="text-muted">
+                                                {{ comment.created_at }}
+                                            </small>
+                                        </h5>
+                                        <p>{{ comment.content | linebreaks }}</p>
+
+{#                                          생성일자 != 수정일자일 때에 수정일자 표시하는 코드, 데이터베이스에 밀리세컨드 단위로 들어가서 오류남 #}
+{#                                        {% if comment.created_at != comment.modified_at %}#}
+{#                                            <p class="text-muted float-right">#}
+{#                                                 <small>Creaated : {{ comment.created_at }}</small><br/>#}
+{#                                                <small>Modified : {{ comment.modified_at }}</small>#}
+{#                                            </p>#}
+{#                                        {% endif %}#}
+
+                                    </a>
                                 </div>
 
                             </div>
