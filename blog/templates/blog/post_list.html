@@ -34,7 +34,7 @@
                     {% if p.hook_text %}
                         <h5 class="text-muted">{{ p.hook_text }}</h5>
                     {% endif %}
-                    <p class="card-text">{{ p.get_content_markdown | truncatewords_html:50 | safe}}</p>
+                    <p class="card-text">{{ p.get_content_markdown | truncatewords_html:50 | safe }}</p>
 
                     {% if p.tags.exists %}
                         <i class="fas fa-tags"></i>
@@ -59,13 +59,29 @@
     {% endif %}
 
     <!-- Pagination -->
-    <ul class="pagination justify-content-center mb-4">
-        <li class="page-item">
-            <a class="page-link" href="#">&larr; Older</a>
-        </li>
-        <li class="page-item disabled">
-            <a class="page-link" href="#">Newer &rarr;</a>
-        </li>
-    </ul>
+    {% if is_pagenated %} {# 만약 페이지네이션이 구현되어 있다면(페이지네이션을 할 필요가 없다면 작동하지 않음) #}
+
+        <ul class="pagination justify-content-center mb-4">
+            {% if page_obj.has_next %} {# 다음 페이지가 존재한다면, 다음 페이지로 가는 링크를 생성 #}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ page.obj.next_page_number }}">&larr; Older</a>
+                </li>
+            {% else %} {# 다음 페이지가 존재하지 않는다면, 버튼을 비활성화함 #}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Older&rarr;</a>
+                </li>
+            {% endif %}
+
+            {% if page_obj.has_previous %} {# 이전 페이지가 존재한다면, 다음 페이지로 가는 링크를 생성 #}
+                <li class="page-item">
+                    <a class="page-link" href="?{{ page.obj.previous_page_number }}">Newer &larr;</a>
+                </li>
+            {% else %}  {# 이전 페이지가 존재하지 않는다면, 버튼을 비활성화함 #}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Newer &rarr;</a>
+                </li>
+            {% endif %}
+        </ul>
+    {% endif %}
 
 {% endblock %}
