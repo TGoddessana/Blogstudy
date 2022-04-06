@@ -135,6 +135,7 @@ def category_page(request, slug):
     )
 
 
+# FBV
 def tag_page(request, slug):
     tag = Tag.objects.get(slug=slug)
     post_list = tag.post_set.all()
@@ -150,7 +151,7 @@ def tag_page(request, slug):
         }
     )
 
-
+# FBV
 def new_comment(request, pk):
     if request.user.is_authenticated:  # 로그인하지 않은 경우에는 접근하지 못하도록
         post = get_object_or_404(Post, pk=pk)  # pk가 없는 경우에는 404 에러 발생
@@ -178,3 +179,12 @@ class CommentUpdate(LoginRequiredMixin, UpdateView):
             return super(CommentUpdate, self).dispatch(request, *args, **kwargs)
         else:
             raise PermissionDenied
+
+def delete_comment(request,pk): # 삭제 요청과 pk값을 인자로 받는다.
+    comment = get_object_or_404(Comment, pk=pk) # pk로 댓글을 가져오거나 HTTP404를 발생시킨다.
+    post = comment.post # 삭제하려는 댓글의 post
+    if request.user.is_authenticated and request.user == comment.author:
+        comment.delete()
+        return redirect(post.get_absolute_url())
+    else:
+        raise PermissionDenied

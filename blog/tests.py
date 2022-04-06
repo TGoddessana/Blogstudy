@@ -52,6 +52,7 @@ class TestView(TestCase):
         self.post_003.tags.add(self.tag_go)
         self.post_003.tags.add(self.tag_js)
 
+        # user1이 post_001에 작성한 임의의 댓글 작성
         self.comment_001 = Comment.objects.create(
             post=self.post_001,
             author=self.user_user1,
@@ -409,4 +410,70 @@ class TestView(TestCase):
         soup = BeautifulSoup(response.content, 'html.parser')
         comment_001_div = soup.find('div', id='comment-1')
         self.assertIn('댓글 수정 테스트.', comment_001_div.text)
+        # 수정일시 != 작성일시 일 때에 수정일시 나타나는지 테스트 코드
         # self.assertIn('Updated :', comment_001_div.text)
+
+
+    def test_delete_comment(self):
+        '''
+        user 1 : post001 에 'first comment.' 작성
+        user 2 : post001 에 'comment by user2.' 작성
+        '''
+        comment_by_user2 = Comment.objects.create( # user2가 post_001에 작성한 임의의 댓글 작성
+            post = self.post_001,
+            author = self.user_user2,
+            content = 'comment by user2.'
+        )
+
+        self.assertEqual(Comment.objects.count(), 2) # setup함수에서 작성한 댓글 + 위에서 작성한 댓글 = 총 2개의 댓글이 되어야 함
+        self.assertEqual(self.post_001.comment_set.count(), 2) # 포스트 001에 달린 댓글이 2개여야 함
+
+        #로그인 X
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-btn')) # 로그인하지 않은 경우 삭제 버튼이 없어야 함
+        self.assertFalse(comment_area.find('a', id='comment-2-delete-btn')) # 로그인하지 않은 경우 삭제 버튼이 없어야 함
+
+        # user2로 로그인
+        self.client.login(username='user2', password='somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-btn')) # user2가 작성하지 않은 댓글의 경우, 삭제 버튼이 없어야 함
+        comment_002_delete_modal_btn = comment_area.find(
+            'a', id='comment-2-delete-modal-btn'
+        )
+        self.assertIn('delete', comment_002_delete_modal_btn.text) # 모달 버튼에 'delete'라는 문구가 있어야 함
+        self.assertEqual( # data-target 속성이 '#deleteCommentModal-2' 와 같아야 함
+            comment_002_delete_modal_btn.attrs['data-target'],
+            '#deleteCommentModal-2'
+        )
+
+        delete_comment_modal_002 = soup.find('div', id='deleteCommentModal-2')
+        self.assertIn('Are you sure?', delete_comment_modal_002.text) # 모달 창에 정말 삭제할 것인지를 묻는 문구가 있는지를 확인
+        really_delete_btn_002 = delete_comment_modal_002.find('a')
+        self.assertIn('Delete', really_delete_btn_002.text)
+        self.assertEqual(
+            really_delete_btn_002.attrs['href'],
+            '/blog/delete_comment/2/'
+        )
+
+        response = self.client.get('/blog/delete_comment/2/', follow=True) # 댓글 삭제 요청
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(self.post_001.title, soup.title.text)
+        comment_area = soup.find('div', id='comment-area')
+        self.assertNotIn('comment by user2.', comment_area.text) # 삭제한 이후에는 댓글의 내용이 보이지 않야야 함
+
+        self.assertEqual(Comment.objects.count(), 1) # 댓글 2개 중 1개를 삭제하면 나머지 1개만 남아야 함
+        self.assertEqual(self.post_001.comment_set.count(), 1)
+
+
+
+
+
