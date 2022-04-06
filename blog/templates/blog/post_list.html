@@ -59,28 +59,31 @@
     {% endif %}
 
     <!-- Pagination -->
-    {% if is_pagenated %} {# 만약 페이지네이션이 구현되어 있다면(페이지네이션을 할 필요가 없다면 작동하지 않음) #}
-
+    {% if is_paginated %} {# 만약 포스트 갯수가 페이지네이션 할 포스트 갯수보다 많다면 페이지네이션이 작동 #}
         <ul class="pagination justify-content-center mb-4">
-            {% if page_obj.has_next %} {# 다음 페이지가 존재한다면, 다음 페이지로 가는 링크를 생성 #}
-                <li class="page-item">
-                    <a class="page-link" href="?{{ page.obj.next_page_number }}">&larr; Older</a>
-                </li>
-            {% else %} {# 다음 페이지가 존재하지 않는다면, 버튼을 비활성화함 #}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#">Older&rarr;</a>
-                </li>
-            {% endif %}
+
 
             {% if page_obj.has_previous %} {# 이전 페이지가 존재한다면, 다음 페이지로 가는 링크를 생성 #}
                 <li class="page-item">
-                    <a class="page-link" href="?{{ page.obj.previous_page_number }}">Newer &larr;</a>
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Newer</a>
                 </li>
             {% else %}  {# 이전 페이지가 존재하지 않는다면, 버튼을 비활성화함 #}
                 <li class="page-item disabled">
-                    <a class="page-link" href="#">Newer &rarr;</a>
+                    <a class="page-link" href="#">Newer</a>
                 </li>
             {% endif %}
+
+            {% if page_obj.has_next %} {# 다음 페이지가 존재한다면, 다음 페이지로 가는 링크를 생성 #}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Older</a>
+                </li>
+            {% else %} {# 다음 페이지가 존재하지 않는다면, 버튼을 비활성화함 #}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">Older</a>
+                </li>
+            {% endif %}
+
+
         </ul>
     {% endif %}
 
