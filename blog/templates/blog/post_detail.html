@@ -114,76 +114,79 @@
                             <div class="d-flex" id="comment-{{ comment.pk }}">
 
                                 <div class="flex-shrink-0">
-                                    <img class="mr-3" src="https://dummyimage.com/60x60/ced4da/6c757d.jpg" alt="..."/>
+                                    <img class="mr-3 rounded-circle" src="{{ comment.get_avatar_url }}"
+                                         alt="{{ comment.author }}" width="60px" />
                                 </div>
 
                                 <div class="ms-3">
-                                    <a class="mt-0">
-                                        {% if user.is_authenticated and comment.author == user %}
-                                            <div class="float-right">
-                                                <a role="button"
-                                                   class="btn btn-sm btn-info float-right"
-                                                   id="comment-{{ comment.pk }}-update-btn"
-                                                   href="/blog/update_comment/{{ comment.pk }}/">
-                                                    edit
-                                                </a>
-                                                <a role="button" href="#" {# 버튼을 만들고 실제로 삭제할 것인지 물어보는 모달 #}
-                                                   id="comment-{{ comment.pk }}-delete-modal-btn"
-                                                   class="btn btn-sm btn-danger"
-                                                   data-toggle="modal"
-                                                   data-target="#deleteCommentModal-{{ comment.pk }}">
-                                                    delete
-                                                </a>
-                                            </div>
 
-                                            {# Modal #}
-                                            <div class="modal fade" id="deleteCommentModal-{{ comment.pk }}"
-                                                 tabindex="-1"
-                                                 role="dialog" aria-labelledby="deleteCommentModalLabel"
-                                                 aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
-                                                            <button type="button" class="close" data-dismiss="modal"
-                                                                    aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <del>{{ comment | linebreaks }}</del> {# 모달 내용에는 댓글 내용이 보이게 됨 #}
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                    data-dismiss="modal">Cancel
-                                                            </button>
-                                                            <a role="button" class="btn btn-danger"
-                                                               href="/blog/delete_comment/{{ comment.pk }}/">Delete</a> {# 확실히 삭제할 것이면 삭제하는 경로로 이동 #}
-                                                        </div>
+                                    {% if user.is_authenticated and comment.author == user %}
+                                        <div class="float-right">
+                                            <a role="button"
+                                               class="btn btn-sm btn-info float-right"
+                                               id="comment-{{ comment.pk }}-update-btn"
+                                               href="/blog/update_comment/{{ comment.pk }}/">
+                                                edit
+                                            </a>
+                                            <a role="button" href="#" {# 버튼을 만들고 실제로 삭제할 것인지 물어보는 모달 #}
+                                               id="comment-{{ comment.pk }}-delete-modal-btn"
+                                               class="btn btn-sm btn-danger"
+                                               data-toggle="modal"
+                                               data-target="#deleteCommentModal-{{ comment.pk }}">
+                                                delete
+                                            </a>
+                                        </div>
+
+                                        {# Modal #}
+                                        <div class="modal fade" id="deleteCommentModal-{{ comment.pk }}"
+                                             tabindex="-1"
+                                             role="dialog" aria-labelledby="deleteCommentModalLabel"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <del>{{ comment | linebreaks }}</del>
+                                                        {# 모달 내용에는 댓글 내용이 보이게 됨 #}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Cancel
+                                                        </button>
+                                                        <a role="button" class="btn btn-danger"
+                                                           href="/blog/delete_comment/{{ comment.pk }}/">Delete</a>
+                                                        {# 확실히 삭제할 것이면 삭제하는 경로로 이동 #}
                                                     </div>
                                                 </div>
                                             </div>
-                                        {% endif %}
-                                        <h5 class="mt-0">
-                                            {{ comment.author.username }}&nbsp;&nbsp;
-                                            <small class="text-muted">
-                                                {{ comment.created_at }}
-                                            </small>
-                                        </h5>
-                                        <p>{{ comment.content | linebreaks }}</p>
+                                        </div>
+                                    {% endif %}
+                                    <h5 class="mt-0">
+                                        {{ comment.author.username }}&nbsp;&nbsp;
+                                        <small class="text-muted">
+                                            {{ comment.created_at }}
+                                        </small>
+                                    </h5>
+                                    <p>{{ comment.content | linebreaks }}</p>
 
-                                        {#                                          생성일자 != 수정일자일 때에 수정일자 표시하는 코드, 데이터베이스에 밀리세컨드 단위로 들어가서 오류남 #}
-                                        {#                                        {% if comment.created_at != comment.modified_at %}#}
-                                        {#                                            <p class="text-muted float-right">#}
-                                        {#                                                 <small>Creaated : {{ comment.created_at }}</small><br/>#}
-                                        {#                                                <small>Modified : {{ comment.modified_at }}</small>#}
-                                        {#                                            </p>#}
-                                        {#                                        {% endif %}#}
+                                    {#                                          생성일자 != 수정일자일 때에 수정일자 표시하는 코드, 데이터베이스에 밀리세컨드 단위로 들어가서 오류남 #}
+                                    {#                                        {% if comment.created_at != comment.modified_at %}#}
+                                    {#                                            <p class="text-muted float-right">#}
+                                    {#                                                 <small>Creaated : {{ comment.created_at }}</small><br/>#}
+                                    {#                                                <small>Modified : {{ comment.modified_at }}</small>#}
+                                    {#                                            </p>#}
+                                    {#                                        {% endif %}#}
 
-                                    </a>
                                 </div>
 
                             </div>
+                            <hr/>
                         {% endfor %}
                     {% endif %}
                     {# single comment #}

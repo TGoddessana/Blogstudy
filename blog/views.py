@@ -13,7 +13,7 @@ import pprint
 class PostList(ListView):
     model = Post  # model을 정해 줌.
     ordering = '-pk'
-    paginate_by = 4
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super(PostList, self).get_context_data()
@@ -192,6 +192,8 @@ def delete_comment(request,pk): # 삭제 요청과 pk값을 인자로 받는다.
         raise PermissionDenied
 
 class PostSearch(PostList):
+
+    paginate_by = None
 
     def get_queryset(self):
         q = self.kwargs['q']
