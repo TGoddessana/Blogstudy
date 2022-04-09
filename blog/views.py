@@ -5,7 +5,8 @@ from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
-
+from django.db.models import Q
+import pprint
 
 # 태그 오류 수정 전.
 
@@ -189,3 +190,19 @@ def delete_comment(request,pk): # 삭제 요청과 pk값을 인자로 받는다.
         return redirect(post.get_absolute_url())
     else:
         raise PermissionDenied
+
+class PostSearch(PostList):
+
+    def get_queryset(self):
+        q = self.kwargs['q']
+        post_list = Post.objects.filter(
+            Q(title__contains=q) | Q(tags__name__contains=q)
+        ).distinct()
+        return post_list
+
+    def get_context_data(self, **kwargs):
+        context = super(PostSearch, self).get_context_data()
+        q = self.kwargs['q']
+        context['search_info'] = f'Search: {q}({self.get_queryset().count()})'
+
+        return context
